@@ -14,26 +14,34 @@ namespace tqft.categories.monoidal_category
 
 universe variables u v
 
-structure LaxMonoidalCategory
-  extends carrier : PreMonoidalCategory :=
-  (associator_transformation : Associator carrier)
+structure LaxMonoidalCategory :=
+  (parent : PreMonoidalCategory)
+  (associator_transformation : Associator parent)
   (pentagon   : pentagon_3step associator_transformation = pentagon_2step associator_transformation)
 
 instance LaxMonoidalCategory_coercion : has_coe LaxMonoidalCategory.{u v} PreMonoidalCategory.{u v} :=
-  ⟨LaxMonoidalCategory.to_PreMonoidalCategory⟩
+  ⟨LaxMonoidalCategory.parent⟩
 
--- structure OplaxMonoidalCategory
---   extends carrier : PreMonoidalCategory :=
---   -- TODO better name? unfortunately it doesn't yet make sense to say 'inverse_associator'.
---   (backwards_associator : Π (X Y Z : Obj),
---      Hom (tensor (X, tensor (Y, Z)))  (tensor (tensor (X, Y), Z)))
+-- Copying fields. TODO: automate
+@[reducible] definition LaxMonoidalCategory.Obj      ( C : LaxMonoidalCategory ) := @PreMonoidalCategory.Obj      C^.parent
+@[reducible] definition LaxMonoidalCategory.Hom      ( C : LaxMonoidalCategory ) := @PreMonoidalCategory.Hom      C^.parent
+@[reducible] definition LaxMonoidalCategory.identity ( C : LaxMonoidalCategory ) := @PreMonoidalCategory.identity C^.parent
+@[reducible] definition LaxMonoidalCategory.compose  ( C : LaxMonoidalCategory ) := @PreMonoidalCategory.compose  C^.parent
+@[reducible] definition LaxMonoidalCategory.tensor   ( C : LaxMonoidalCategory ) := @PreMonoidalCategory.tensor   C^.parent
 
--- instance OplaxMonoidalCategory_coercion : has_coe OplaxMonoidalCategory PreMonoidalCategory :=
---   ⟨OplaxMonoidalCategory.to_PreMonoidalCategory⟩
+-- TODO bring back OplaxMonoidalCategory
 
-structure MonoidalCategory
-  extends LaxMonoidalCategory/-, OplaxMonoidalCategory-/ :=
-  (associator_is_isomorphism : is_NaturalIsomorphism associator_transformation)
+structure MonoidalCategory :=
+  (parent : LaxMonoidalCategory)
+  (associator_is_isomorphism : is_NaturalIsomorphism parent^.associator_transformation)
+
+-- Copying fields. TODO: automate
+@[reducible] definition MonoidalCategory.Obj                       ( C : MonoidalCategory ) := @LaxMonoidalCategory.Obj                       C^.parent
+@[reducible] definition MonoidalCategory.Hom                       ( C : MonoidalCategory ) := @LaxMonoidalCategory.Hom                       C^.parent
+@[reducible] definition MonoidalCategory.identity                  ( C : MonoidalCategory ) := @LaxMonoidalCategory.identity                  C^.parent
+@[reducible] definition MonoidalCategory.compose                   ( C : MonoidalCategory ) := @LaxMonoidalCategory.compose                   C^.parent
+@[reducible] definition MonoidalCategory.tensor                    ( C : MonoidalCategory ) := @LaxMonoidalCategory.tensor                    C^.parent
+@[reducible] definition MonoidalCategory.associator_transformation ( C : MonoidalCategory ) := @LaxMonoidalCategory.associator_transformation C^.parent
 
 -- Convenience methods which take two arguments, rather than a pair. (This seems to often help the elaborator avoid getting stuck on `prod.mk`.)
 @[reducible] definition MonoidalCategory.tensorObjects   ( C : MonoidalCategory ) ( X Y : C^.Obj ) : C^.Obj := C^.tensor (X, Y)
@@ -44,8 +52,7 @@ definition MonoidalCategory.associator
   ( X Y Z : C^.Obj ) : C^.Hom (C^.tensorObjects (C^.tensorObjects X Y) Z) (C^.tensorObjects X (C^.tensorObjects Y Z)) :=
   C^.associator_transformation ((X, Y), Z)
 
-instance MonoidalCategory_coercion_to_LaxMonoidalCategory   : has_coe MonoidalCategory.{u v} LaxMonoidalCategory.{u v}   := ⟨MonoidalCategory.to_LaxMonoidalCategory⟩
--- instance MonoidalCategory_coercion_to_OplaxMonoidalCategory : has_coe MonoidalCategory OplaxMonoidalCategory := ⟨MonoidalCategory.to_OplaxMonoidalCategory⟩
+instance MonoidalCategory_coercion_to_LaxMonoidalCategory : has_coe MonoidalCategory.{u v} LaxMonoidalCategory.{u v} := ⟨MonoidalCategory.parent⟩
 
 -- TODO This works, but do we really need to be so explicit??
 @[reducible] definition MonoidalCategory.interchange
@@ -62,42 +69,5 @@ instance MonoidalCategory_coercion_to_LaxMonoidalCategory   : has_coe MonoidalCa
 --                     (f : C^.Hom W X) (g : C^.Hom Y Z),
 --                     C^.tensorMorphisms f g
 --end notations
-
--- per https://groups.google.com/d/msg/lean-user/kkIFgWRJTLo/tr2VyJGmCQAJ
-local attribute [reducible] lift_t coe_t coe_b
-
-definition tensor_on_left { C: MonoidalCategory.{u v} } ( Z: C^.Obj ) : Functor.{u v u v} C C :=
-{
-  onObjects := λ X, C^.tensorObjects Z X,
-  onMorphisms := λ X Y f, C^.tensorMorphisms (C^.identity Z) f,
-  identities := begin
-                  blast,
-                  rewrite Functor.identities (C^.tensor),                
-                end,
-  functoriality := begin
-                      blast,
-                      -- TODO, why doesn't this work?
-                      -- begin[smt]
-                      --   eblast_using [ Category.left_identity, MonoidalCategory.interchange ]
-                      -- end,
-                      rewrite - C^.interchange,
-                      rewrite C^.left_identity
-                    end
-}
-
-definition tensor_on_right { C: MonoidalCategory.{u v} } ( Z: C^.Obj ) : Functor.{u v u v} C C :=
-{
-  onObjects := λ X, C^.tensorObjects X Z,
-  onMorphisms := λ X Y f, C^.tensorMorphisms f (C^.identity Z),
-  identities := begin
-                  blast,
-                  rewrite Functor.identities (C^.tensor),                
-                end,
-  functoriality := begin
-                      blast,
-                      rewrite - C^.interchange,
-                      rewrite C^.left_identity
-                    end
-}
   
 end tqft.categories.monoidal_category

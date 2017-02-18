@@ -16,12 +16,10 @@ universe variables u v
 
 @[reducible] definition TensorProduct ( C: Category ) := Functor ( C × C ) C
 
-structure PreMonoidalCategory
-  -- this is only for internal use: it has a tensor product, but no associator at all
-  -- it's not interesting mathematically, but may allow us to introduce usable notation for the tensor product
-  extends carrier : Category :=
-  (tensor : TensorProduct carrier)
-  (tensor_unit : Obj)
+structure PreMonoidalCategory :=
+  (category : Category)
+  (tensor : TensorProduct category)
+  (tensor_unit : category^.Obj)
 
 namespace PreMonoidalCategory
   notation X `⊗` Y := (PreMonoidalCategory.tensor _)^.onObjects (X, Y)
@@ -29,7 +27,13 @@ namespace PreMonoidalCategory
 end PreMonoidalCategory
 
 instance PreMonoidalCategory_coercion : has_coe PreMonoidalCategory Category := 
-  ⟨PreMonoidalCategory.to_Category⟩
+  ⟨PreMonoidalCategory.category⟩
+
+-- Copying fields. TODO: automate
+@[reducible] definition PreMonoidalCategory.Obj      ( C : PreMonoidalCategory ) := @Category.Obj      C^.category
+@[reducible] definition PreMonoidalCategory.Hom      ( C : PreMonoidalCategory ) := @Category.Hom      C^.category
+@[reducible] definition PreMonoidalCategory.identity ( C : PreMonoidalCategory ) := @Category.identity C^.category
+@[reducible] definition PreMonoidalCategory.compose  ( C : PreMonoidalCategory ) := @Category.compose  C^.category
 
 definition left_associated_triple_tensor ( C : PreMonoidalCategory.{ u v } ) : Functor ((C × C) × C) C :=
   FunctorComposition (C^.tensor × IdentityFunctor C) C^.tensor

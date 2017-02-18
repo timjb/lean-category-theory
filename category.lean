@@ -28,9 +28,9 @@ structure Category :=
 attribute [simp] Category.left_identity
 attribute [simp] Category.right_identity
 
-namespace Category
-  notation f `∘` g := Category.compose f g
-end Category
+-- namespace Category
+--   notation f `∘` g := Category.compose f g
+-- end Category
 
 -- attribute [class] Category
 /-

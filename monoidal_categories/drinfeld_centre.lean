@@ -2,8 +2,7 @@
 -- Released under Apache 2.0 license as described in the file LICENSE.
 -- Authors: Stephen Morgan, Scott Morrison
 import .braided_monoidal_category
-
---set_option pp.universes true
+import .tensor_with_object
 
 open tqft.categories
 open tqft.categories.functor

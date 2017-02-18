@@ -20,14 +20,23 @@ universe variables u v
 -/
 
 definition Braiding(C : MonoidalCategory.{u v}) := 
-  NaturalIsomorphism (C^.tensor) (FunctorComposition (SwitchProductCategory C^.to_LaxMonoidalCategory^.to_PreMonoidalCategory^.to_Category C) C^.tensor)
+  NaturalIsomorphism (C^.tensor) (FunctorComposition (SwitchProductCategory C C) C^.tensor)
 
-structure BraidedMonoidalCategory
-  extends parent: MonoidalCategory :=
+structure BraidedMonoidalCategory :=
+  (parent: MonoidalCategory)
   (braiding: Braiding parent)
 -- TODO hexagon!
 
-instance BraidedMonoidalCategory_coercion_to_MonoidalCategory : has_coe BraidedMonoidalCategory MonoidalCategory := ⟨BraidedMonoidalCategory.to_MonoidalCategory⟩
+-- Copying fields. TODO: automate
+@[reducible] definition BraidedMonoidalCategory.Obj                       ( C : BraidedMonoidalCategory ) := @MonoidalCategory.Obj                       C^.parent
+@[reducible] definition BraidedMonoidalCategory.Hom                       ( C : BraidedMonoidalCategory ) := @MonoidalCategory.Hom                       C^.parent
+@[reducible] definition BraidedMonoidalCategory.identity                  ( C : BraidedMonoidalCategory ) := @MonoidalCategory.identity                  C^.parent
+@[reducible] definition BraidedMonoidalCategory.compose                   ( C : BraidedMonoidalCategory ) := @MonoidalCategory.compose                   C^.parent
+@[reducible] definition BraidedMonoidalCategory.tensor                    ( C : BraidedMonoidalCategory ) := @MonoidalCategory.tensor                    C^.parent
+@[reducible] definition BraidedMonoidalCategory.associator_transformation ( C : BraidedMonoidalCategory ) := @MonoidalCategory.associator_transformation C^.parent
+@[reducible] definition BraidedMonoidalCategory.associator_is_isomorphism ( C : BraidedMonoidalCategory ) := @MonoidalCategory.associator_is_isomorphism C^.parent
+
+instance BraidedMonoidalCategory_coercion_to_MonoidalCategory : has_coe BraidedMonoidalCategory MonoidalCategory := ⟨BraidedMonoidalCategory.parent⟩
 
 @[reducible] definition squared_Braiding { C : MonoidalCategory.{u v} } ( braiding : Braiding C )
   : NaturalTransformation C^.tensor C^.tensor :=
@@ -42,8 +51,8 @@ instance BraidedMonoidalCategory_coercion_to_MonoidalCategory : has_coe BraidedM
 @[reducible] definition Symmetry(C : BraidedMonoidalCategory) : Prop :=
   squared_Braiding (C^.braiding) = IdentityNaturalTransformation C^.tensor
 
-structure SymmetricMonoidalCategory
-  extends parent: BraidedMonoidalCategory :=
+structure SymmetricMonoidalCategory :=
+  (parent: BraidedMonoidalCategory)
   (symmetry: Symmetry parent)
 
 end tqft.categories.braided_monoidal_category
