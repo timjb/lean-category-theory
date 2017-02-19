@@ -15,6 +15,13 @@ def pointwise_attribute : user_attribute := {
 
 run_command attribute.register `pointwise_attribute
 
+def pointwise_2_attribute : user_attribute := {
+  name := `pointwise_2,
+  descr := "A lemma that proves things are equal using the fact they are pointwise equal, generating two subgoals."
+}
+
+run_command attribute.register `pointwise_2_attribute
+
 -- def searchable_attribute : user_attribute := {
 --   name := `searchable,
 --   descr := "An identifier that the SMT solver should have access to."
@@ -27,15 +34,20 @@ meta def any_apply : list name → tactic unit
 | []      := failed
 | (c::cs) := (mk_const c >>= fapply) <|> any_apply cs
 
-meta def smt   : tactic unit := using_smt $ intros >> add_lemmas_from_facts >> try ematch >> try simp
+meta def smt_simp        : tactic unit := using_smt $ intros >> try simp
+meta def smt_ematch : tactic unit := using_smt $ intros >> add_lemmas_from_facts >> try ematch
 
 meta def pointwise (and_then : tactic unit) : tactic unit :=
 do cs ← attribute.get_instances `pointwise,
    try (any_apply cs >> and_then)
 
+meta def pointwise_2 (and_then : tactic unit) : tactic unit :=
+do cs ← attribute.get_instances `pointwise_2,
+   try (any_apply cs >> repeat_at_most 2 and_then)
+
 attribute [pointwise] funext
 
-meta def blast : tactic unit := smt >> pointwise (repeat_at_most 2 blast) -- pointwise equality of functors creates two goals
+meta def blast        : tactic unit := smt_simp >> pointwise blast >> pointwise_2 blast -- pointwise equality of functors creates two goals
 
 -- In a timing test on 2017-02-18, I found that using `abstract { blast }` instead of just `blast` resulted in a 5x speed-up!
 notation `♮` := by abstract { blast }
@@ -48,5 +60,5 @@ notation `♮` := by abstract { blast }
 attribute [pointwise] subtype.eq
 
 def {u} auto_cast {α β : Type u} {h : α = β} (a : α) := cast h a
-@[simp] lemma {u} auto_cast_identity {α : Type u} (a : α) : @auto_cast α α ♮ a = a := ♮
-notation `⟦` p `⟧` := @auto_cast _ _ ♮ p
+@[simp] lemma {u} auto_cast_identity {α : Type u} (a : α) : @auto_cast α α (by smt_ematch) a = a := ♮
+notation `⟦` p `⟧` := @auto_cast _ _ (by smt_ematch) p

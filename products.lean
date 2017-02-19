@@ -13,23 +13,22 @@ namespace tqft.categories.products
 
 universe variables u1 v1 u2 v2 u3 v3
 
-@[reducible] definition ProductCategory (C : Category.{u1 v1}) (D : Category.{u2 v2}) :
-  Category :=
-  {
-    Obj      := C^.Obj × D^.Obj,
-    Hom      := (λ X Y : C^.Obj × D^.Obj, C^.Hom (X^.fst) (Y^.fst) × D^.Hom (X^.snd) (Y^.snd)),
-    identity := λ X, (C^.identity (X^.fst), D^.identity (X^.snd)),
-    compose  := λ _ _ _ f g, (C^.compose (f^.fst) (g^.fst), D^.compose (f^.snd) (g^.snd)),
+@[reducible] definition ProductCategory (C : Category.{u1 v1}) (D : Category.{u2 v2}) : Category :=
+{
+  Obj      := C^.Obj × D^.Obj,
+  Hom      := (λ X Y : C^.Obj × D^.Obj, C^.Hom (X^.fst) (Y^.fst) × D^.Hom (X^.snd) (Y^.snd)),
+  identity := λ X, (C^.identity (X^.fst), D^.identity (X^.snd)),
+  compose  := λ _ _ _ f g, (C^.compose (f^.fst) (g^.fst), D^.compose (f^.snd) (g^.snd)),
 
-    left_identity  := ♮,
-    right_identity := ♮,
-    associativity  := begin
-                        blast,
-                        begin[smt]
-                          eblast_using [ Category.associativity ]
-                        end
+  left_identity  := ♮,
+  right_identity := ♮,
+  associativity  := begin
+                      blast,
+                      begin[smt]
+                        eblast_using [ Category.associativity ]
                       end
-  }
+                    end
+}
 
 namespace ProductCategory
   notation C `×` D := ProductCategory C D

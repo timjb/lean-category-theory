@@ -24,25 +24,30 @@ open tqft.categories
 
 open tqft.categories.monoidal_category
 
+definition TensorProductOfTypes : TensorProduct CategoryOfTypes :=
+{
+  onObjects     := λ p, prod p.1 p.2,
+  onMorphisms   := λ _ _ p, λ q, (p.1 q.1, p.2 q.2),
+  identities    := ♮,
+  functoriality := ♮
+}
+
 definition PreMonoidalCategoryOfTypes : PreMonoidalCategory :=
 {
-    category := CategoryOfTypes,
-    tensor := {
-        onObjects     := λ p, prod p.1 p.2,
-        onMorphisms   := λ _ _ p, λ q, (p.1 q.1, p.2 q.2),
-        identities    := ♮,
-        functoriality := ♮
-    },
-    tensor_unit := punit
+  category := CategoryOfTypes,
+  tensor := TensorProductOfTypes,
+  tensor_unit := punit
+}
+
+definition TypeAssociator : Associator PreMonoidalCategoryOfTypes := {
+  components := λ p, λ t, (t.1.1,(t.1.2, t.2)),
+  naturality := ♮
 }
 
 definition LaxMonoidalCategoryOfTypes : LaxMonoidalCategory :=
 {
     parent := PreMonoidalCategoryOfTypes,
-    associator_transformation := {
-      components := λ p, λ t, (t.1.1,(t.1.2, t.2)),
-      naturality := ♮
-    },
+    associator_transformation := TypeAssociator,
     pentagon := ♮
 }
 

@@ -61,7 +61,7 @@ definition pentagon_3step_3 { C : PreMonoidalCategory.{ u v } } ( α : Associato
   whisker_on_left
     (FunctorComposition
       (ProductCategoryAssociator C C C × IdentityFunctor C)
-      (ProductCategoryAssociator C (↑C × ↑C) C))
+      (ProductCategoryAssociator C (C × C) C))
     (whisker_on_right
       (IdentityNaturalTransformation (IdentityFunctor C) × α)
       C^.tensor)
@@ -81,8 +81,8 @@ definition pentagon_2step_1 { C : PreMonoidalCategory.{ u v } } ( α : Associato
 definition pentagon_2step_2 { C : PreMonoidalCategory.{ u v } } ( α : Associator.{ u v } C ) :=
   whisker_on_left
     (FunctorComposition
-      (ProductCategoryAssociator (↑C × ↑C) C C)
-      (IdentityFunctor (↑C × ↑C) × C^.tensor))
+      (ProductCategoryAssociator (C × C) C C)
+      (IdentityFunctor (C × C) × C^.tensor))
     α
 
 definition pentagon_2step { C : PreMonoidalCategory.{ u v } } ( α : Associator.{ u v } C ) :=
