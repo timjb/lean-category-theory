@@ -72,7 +72,7 @@ definition LaxMonoidalCategoryOfSemigroups : LaxMonoidalCategory :=
 
 definition MonoidalCategoryOfSemigroups : MonoidalCategory :=
 {
-  parents := LaxMonoidalCategoryOfSemigroups,
+  parent := LaxMonoidalCategoryOfSemigroups,
   associator_is_isomorphism := {
     inverse := {
       components := λ _, {
@@ -81,8 +81,8 @@ definition MonoidalCategoryOfSemigroups : MonoidalCategory :=
       },
       naturality := ♮     
     },
-    witness_1 := sorry,
-    witness_2 := sorry
+    witness_1 := ♮,
+    witness_2 := ♮
   }
 }
 

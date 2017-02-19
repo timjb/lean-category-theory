@@ -24,7 +24,7 @@ definition tensor_on_left { C: MonoidalCategory.{u v} } ( Z: C^.Obj ) : Functor.
   onMorphisms := λ X Y f, C^.tensorMorphisms (C^.identity Z) f,
   identities := begin
                   blast,
-                  rewrite - Functor.identities (C^.tensor),
+                  rewrite Functor.identities (C^.tensor),
                 end,
   functoriality := begin
                       intros,
@@ -35,7 +35,7 @@ definition tensor_on_left { C: MonoidalCategory.{u v} } ( Z: C^.Obj ) : Functor.
                       assert i : @Category.identity C = @MonoidalCategory.identity C, blast,
                       rewrite - i,
                       rewrite - h,
-                      rewrite C^.parent^.parent^.category^.left_identity
+                      rewrite C^.left_identity
                     end
 }
 
@@ -45,7 +45,7 @@ definition tensor_on_right { C: MonoidalCategory.{u v} } ( Z: C^.Obj ) : Functor
   onMorphisms := λ X Y f, C^.tensorMorphisms f (C^.identity Z),
   identities := begin
                   blast,
-                  rewrite - Functor.identities (C^.tensor),  
+                  rewrite Functor.identities (C^.tensor),  
                 end,
   functoriality := begin
                       intros,
@@ -56,7 +56,7 @@ definition tensor_on_right { C: MonoidalCategory.{u v} } ( Z: C^.Obj ) : Functor
                       assert i : @Category.identity C = @MonoidalCategory.identity C, blast,
                       rewrite - i,
                       rewrite - h,
-                      rewrite C^.parent^.parent^.category^.left_identity
+                      rewrite C^.left_identity
                     end
 }
   
