@@ -34,6 +34,9 @@ instance PreMonoidalCategory_coercion : has_coe PreMonoidalCategory Category :=
 @[reducible] definition PreMonoidalCategory.Hom      ( C : PreMonoidalCategory ) := @Category.Hom      C^.category
 @[reducible] definition PreMonoidalCategory.identity ( C : PreMonoidalCategory ) := @Category.identity C^.category
 @[reducible] definition PreMonoidalCategory.compose  ( C : PreMonoidalCategory ) := @Category.compose  C^.category
+@[reducible] definition PreMonoidalCategory.left_identity  ( C : PreMonoidalCategory ) := @Category.left_identity  C^.category
+@[reducible] definition PreMonoidalCategory.right_identity ( C : PreMonoidalCategory ) := @Category.right_identity C^.category
+@[reducible] definition PreMonoidalCategory.associativity  ( C : PreMonoidalCategory ) := @Category.associativity  C^.category
 
 definition left_associated_triple_tensor ( C : PreMonoidalCategory.{ u v } ) : Functor ((C × C) × C) C :=
   FunctorComposition (C^.tensor × IdentityFunctor C) C^.tensor

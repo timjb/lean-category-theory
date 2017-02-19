@@ -10,16 +10,15 @@ open tqft.categories.examples.semigroups
 
 universe variables u
 
--- Can't make progress here, waiting on https://groups.google.com/d/msg/lean-user/1AAIgqIaCwA/m8NMlnNmCgAJ
--- definition SymmetricMonoidalCategoryOfSemigroups : SymmetricMonoidalCategory := {
---   BraidedMonoidalCategoryOfSemigroups.{u} with
---   symmetry := begin
---                 blast,
---                 dsimp [ BraidedMonoidalCategoryOfSemigroups ],
---                 blast,
---                 dsimp [ MonoidalCategoryOfSemigroups ],
---                 exact sorry
---               end
--- }
+definition SymmetricMonoidalCategoryOfSemigroups : SymmetricMonoidalCategory := {
+  parent   := BraidedMonoidalCategoryOfSemigroups,
+  symmetry := begin
+                blast,
+                dsimp [ BraidedMonoidalCategoryOfSemigroups ],
+                blast,
+                dsimp [ MonoidalCategoryOfSemigroups ],
+                exact sorry
+              end
+}
 
 end  tqft.categories.examples.semigroups

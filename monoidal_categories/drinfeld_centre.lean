@@ -34,15 +34,20 @@ structure HalfBraidingMorphism { C : MonoidalCategory } ( X Y : HalfBraiding C )
 --   Hom := λ X Y, HalfBraidingMorphism X Y,
 --   identity := λ X, {
 --     morphism := C^.identity X,
---     witness  := ♮
+--     witness  := begin
+--       intros,
+--       unfold MonoidalCategory.tensorMorphisms,
+--       erewrite C^.tensor^.identities,
+--       rewrite C^.right_identity
+--     end
 --   },
 --   compose := λ _ _ _ f g, {
 --     morphism := C^.compose f^.morphism g^.morphism,
---     witness  := ♮
+--     witness  := sorry
 --   },
---   left_identity  := ♮,
---   right_identity := ♮,
---   associativity  := ♮
+--   left_identity  := sorry,
+--   right_identity := sorry,
+--   associativity  := sorry
 -- }
 
 end tqft.categories.drinfeld_centre

@@ -27,6 +27,9 @@ instance LaxMonoidalCategory_coercion : has_coe LaxMonoidalCategory.{u v} PreMon
 @[reducible] definition LaxMonoidalCategory.Hom      ( C : LaxMonoidalCategory ) := @PreMonoidalCategory.Hom      C^.parent
 @[reducible] definition LaxMonoidalCategory.identity ( C : LaxMonoidalCategory ) := @PreMonoidalCategory.identity C^.parent
 @[reducible] definition LaxMonoidalCategory.compose  ( C : LaxMonoidalCategory ) := @PreMonoidalCategory.compose  C^.parent
+@[reducible] definition LaxMonoidalCategory.left_identity  ( C : LaxMonoidalCategory ) := @PreMonoidalCategory.left_identity  C^.parent
+@[reducible] definition LaxMonoidalCategory.right_identity ( C : LaxMonoidalCategory ) := @PreMonoidalCategory.right_identity C^.parent
+@[reducible] definition LaxMonoidalCategory.associativity  ( C : LaxMonoidalCategory ) := @PreMonoidalCategory.associativity  C^.parent
 @[reducible] definition LaxMonoidalCategory.tensor   ( C : LaxMonoidalCategory ) := @PreMonoidalCategory.tensor   C^.parent
 
 -- TODO bring back OplaxMonoidalCategory
@@ -40,6 +43,9 @@ structure MonoidalCategory :=
 @[reducible] definition MonoidalCategory.Hom                       ( C : MonoidalCategory ) := @LaxMonoidalCategory.Hom                       C^.parent
 @[reducible] definition MonoidalCategory.identity                  ( C : MonoidalCategory ) := @LaxMonoidalCategory.identity                  C^.parent
 @[reducible] definition MonoidalCategory.compose                   ( C : MonoidalCategory ) := @LaxMonoidalCategory.compose                   C^.parent
+@[reducible] definition MonoidalCategory.left_identity             ( C : MonoidalCategory ) := @LaxMonoidalCategory.left_identity             C^.parent
+@[reducible] definition MonoidalCategory.right_identity            ( C : MonoidalCategory ) := @LaxMonoidalCategory.right_identity            C^.parent
+@[reducible] definition MonoidalCategory.associativity             ( C : MonoidalCategory ) := @LaxMonoidalCategory.associativity             C^.parent
 @[reducible] definition MonoidalCategory.tensor                    ( C : MonoidalCategory ) := @LaxMonoidalCategory.tensor                    C^.parent
 @[reducible] definition MonoidalCategory.associator_transformation ( C : MonoidalCategory ) := @LaxMonoidalCategory.associator_transformation C^.parent
 
