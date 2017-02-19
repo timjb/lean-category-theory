@@ -59,7 +59,8 @@ end
     associativity  := ♮
 }
 
-definition trivial_semigroup: semigroup punit := {
+definition trivial_semigroup: semigroup punit :=
+{
   mul := λ _ _, punit.star,
   mul_assoc := ♮
 }
