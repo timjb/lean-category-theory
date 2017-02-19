@@ -2,9 +2,6 @@
 -- Released under Apache 2.0 license as described in the file LICENSE.
 -- Authors: Stephen Morgan, Scott Morrison
 
-set_option pp.universes true
-
-
 open tactic
 open smt_tactic
 
