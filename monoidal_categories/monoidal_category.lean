@@ -17,7 +17,8 @@ universe variables u v
 structure LaxMonoidalCategory :=
   (parent : PreMonoidalCategory)
   (associator_transformation : Associator parent)
-  (pentagon   : pentagon_3step associator_transformation = pentagon_2step associator_transformation)
+  -- (pentagon   : pentagon_3step associator_transformation = pentagon_2step associator_transformation)
+  (pentagon : Pentagon associator_transformation)
 
 instance LaxMonoidalCategory_coercion : has_coe LaxMonoidalCategory.{u v} PreMonoidalCategory.{u v} :=
   ⟨LaxMonoidalCategory.parent⟩
@@ -48,6 +49,7 @@ structure MonoidalCategory :=
 @[reducible] definition MonoidalCategory.associativity             ( C : MonoidalCategory ) := @LaxMonoidalCategory.associativity             C^.parent
 @[reducible] definition MonoidalCategory.tensor                    ( C : MonoidalCategory ) := @LaxMonoidalCategory.tensor                    C^.parent
 @[reducible] definition MonoidalCategory.associator_transformation ( C : MonoidalCategory ) := @LaxMonoidalCategory.associator_transformation C^.parent
+@[reducible] definition MonoidalCategory.pentagon                  ( C : MonoidalCategory ) := @LaxMonoidalCategory.pentagon                  C^.parent
 
 -- Convenience methods which take two arguments, rather than a pair. (This seems to often help the elaborator avoid getting stuck on `prod.mk`.)
 @[reducible] definition MonoidalCategory.tensorObjects   ( C : MonoidalCategory ) ( X Y : C^.Obj ) : C^.Obj := C^.tensor (X, Y)
