@@ -8,25 +8,30 @@ open tqft.categories
 
 namespace tqft.categories.functor
 
-universe variables u1 v1 u2 v2
+variable { Obj₁ : Type* }
+variable { Obj₂ : Type* }
+variable { Obj₃ : Type* }
+variable ( C : Obj₁ → Obj₁ → Type* )
+variable ( D : Obj₂ → Obj₂ → Type* )
+variable ( E : Obj₃ → Obj₃ → Type* )
 
-structure Functor (C : Category.{ u1 v1 }) (D : Category.{ u2 v2 }) :=
-  (onObjects   : C^.Obj → D^.Obj)
-  (onMorphisms : Π { X Y : C^.Obj },
-                C^.Hom X Y → D^.Hom (onObjects X) (onObjects Y))
-  (identities : ∀ (X : C^.Obj),
-    onMorphisms (C^.identity X) = D^.identity (onObjects X))
-  (functoriality : ∀ { X Y Z : C^.Obj } (f : C^.Hom X Y) (g : C^.Hom Y Z),
-    onMorphisms (C^.compose f g) = D^.compose (onMorphisms f) (onMorphisms g))
+structure Functor [ sC : category C ] [ sD : category D ]:=
+  (onObjects : Obj₁ → Obj₂)
+  (onMorphisms : Π { X Y : Obj₁ }, C X Y → D (onObjects X) (onObjects Y))
+  (identities : ∀ ( X : Obj₁ ),
+    onMorphisms (sC^.identity X) = sD^.identity (onObjects X))
+  (functoriality : ∀ { X Y Z : Obj₁ } (f : C X Y) (g : C Y Z),
+    onMorphisms (sC^.compose f g) = sD^.compose (onMorphisms f) (onMorphisms g))
 
+attribute [class] Functor
 attribute [simp] Functor.identities
 attribute [simp] Functor.functoriality
 
 -- We define a coercion so that we can write `F X` for the functor `F` applied to the object `X`.
 -- One can still write out `onObjects F X` when needed.
-instance Functor_to_onObjects { C D : Category }: has_coe_to_fun (Functor C D) :=
-{ F   := λ f, C^.Obj → D^.Obj,
-  coe := Functor.onObjects }
+--instance Functor_to_onObjects [ F : Functor Hom₁ Hom₂ ] : has_coe_to_fun F :=
+--{ F   := λ f, C^.Obj → D^.Obj,
+--  coe := Functor.onObjects }
 
 /-
 -- Unfortunately we haven't been able to set up similar notation for morphisms.
@@ -49,7 +54,8 @@ open notations
 -- { F   := λ f, Π ⦃X Y : C^.Obj⦄, C^.Hom X Y → D^.Hom (f X) (f Y), -- contrary to usual use, `f` here denotes the Functor.
 --  coe := Functor.onMorphisms }
 
-@[reducible] definition IdentityFunctor ( C: Category ) : Functor C C :=
+@[reducible] instance identityFunctor [ sC : category C ] :
+  Functor C C :=
 {
   onObjects     := id,
   onMorphisms   := λ _ _ f, f,
@@ -57,17 +63,23 @@ open notations
   functoriality := ♮
 }
 
-@[reducible] definition FunctorComposition { C D E : Category } ( F : Functor C D ) ( G : Functor D E ) : Functor C E :=
+
+variable F [ sC : category C ] [ sD : category D ] : Functor C D
+variable G [ sD : category D ] [ sE : category E ] : Functor D E
+
+@[reducible] instance FunctorComposition
+  [ sC : category C ] [ sD : category D ] [ sE : category E ]
+  ( F : Functor Hom₁ Hom₂ ) ( G : Functor Hom₂ Hom₃ ) : Functor Hom₁ Hom₃ :=
 {
-  onObjects     := λ X, G (F X),
+  onObjects     := λ X, G^.onObjects (F^.onObjects X),
   onMorphisms   := λ _ _ f, G^.onMorphisms (F^.onMorphisms f),
   identities    := ♮,
   functoriality := ♮
 }
 
-namespace Functor
-  notation F `∘` G := FunctorComposition F G
-end Functor
+--namespace Functor
+--  notation F `∘` G := FunctorComposition F G
+--end Functor
 
 -- We'll want to be able to prove that two functors are equal if they are equal on objects and on morphisms.
 -- Implementation warning:
@@ -93,10 +105,12 @@ begin
   subst h_morphisms
 end
 
-lemma FunctorComposition_left_identity { C D : Category } ( F : Functor C D ) :
-  FunctorComposition (IdentityFunctor C) F = F := ♮
+lemma FunctorComposition_left_identity [ C : category Hom₁ ] [ D : category Hom₂ ]
+  ( F : Functor Hom₁ Hom₂ ) :
+  FunctorComposition (IdentityFunctor Hom₁) F = F := ♮
 
-lemma FunctorComposition_right_identity { C D : Category } ( F : Functor C D ) :
+lemma FunctorComposition_right_identity [ C : category Hom₁ ] [ D : category Hom₂ ]
+  ( F : Functor Hom₁ Hom₂ ) :
   FunctorComposition F (IdentityFunctor D) = F := ♮
 
 lemma FunctorComposition_associative { B C D E : Category } ( F : Functor B C ) ( G : Functor C D ) ( H : Functor D E ) :

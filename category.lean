@@ -14,6 +14,23 @@ namespace tqft.categories
 
 universe variables u v
 
+structure category {Obj : Type*} (Hom : Obj → Obj → Type*) :=
+  (identity : Π X : Obj, Hom X X)
+  (compose  : Π { X Y Z : Obj }, Hom X Y → Hom Y Z → Hom X Z)
+
+  (left_identity  : ∀ { X Y : Obj } ( f : Hom X Y ), compose (identity _) f = f)
+  (right_identity : ∀ { X Y : Obj } ( f : Hom X Y ), compose f (identity _) = f)
+  (associativity  : ∀ { W X Y Z : Obj } ( f : Hom W X ) ( g : Hom X Y ) ( h : Hom Y Z ),
+    compose (compose f g) h = compose f (compose g h))
+
+attribute [class] category
+attribute [simp] category.left_identity
+attribute [simp] category.right_identity
+
+namespace category
+  notation f `∘` g := category.compose _ f g
+end category
+
 structure Category :=
   (Obj : Type u)
   (Hom : Obj → Obj → Type v) 
@@ -25,12 +42,6 @@ structure Category :=
   (associativity  : ∀ { W X Y Z : Obj } (f : Hom W X) (g : Hom X Y) (h : Hom Y Z),
     compose (compose f g) h = compose f (compose g h))
 
-attribute [simp] Category.left_identity
-attribute [simp] Category.right_identity
-
-namespace Category
-  notation f `∘` g := Category.compose f g
-end Category
 
 instance Category_to_Hom : has_coe_to_fun Category :=
 { F   := λ C, C^.Obj → C^.Obj → Type v,
@@ -45,18 +56,23 @@ instance Category_to_Hom : has_coe_to_fun Category :=
 -- We just declare things as structures, and then add the class attribute afterwards.
 -/
 
-structure Isomorphism ( C: Category ) ( X Y : C^.Obj ) :=
-  (morphism : C X Y)
-  (inverse : C Y X)
+variable { Obj : Type* }
+variable Hom : Obj → Obj → Type*
+variable [ C : category Hom ]
+include C
+variables { X Y Z : Obj }
+
+structure Isomorphism (morphism : Hom X Y) :=
+  (inverse : Hom Y X)
   (witness_1 : C^.compose morphism inverse = C^.identity X)
   (witness_2 : C^.compose inverse morphism = C^.identity Y)
 
-instance Isomorphism_coercion_to_morphism { C : Category } { X Y : C^.Obj } : has_coe (Isomorphism C X Y) (C X Y) :=
-  { coe := Isomorphism.morphism }
+attribute [class] Isomorphism
+attribute [simp] Isomorphism.witness_1
+attribute [simp] Isomorphism.witness_2
 
-structure is_isomorphism { C : Category } { X Y : C^.Obj } ( morphism : C X Y ) :=
-  (inverse : C Y X)
-  (witness_1 : C^.compose morphism inverse = C^.identity X)
-  (witness_2 : C^.compose inverse morphism = C^.identity Y)
+instance Isomorphism_coercion_to_morphism { X Y : Obj } ( f : Hom X Y ) :
+  has_coe (Isomorphism Hom f) (Hom X Y) :=
+{ coe := λ _, f }
   
 end tqft.categories
