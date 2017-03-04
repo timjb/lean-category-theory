@@ -15,23 +15,23 @@ namespace tqft.categories.monoidal_category
 universe variables u v
 
 structure LaxMonoidalCategory :=
-  (parent : PreMonoidalCategory)
-  (associator_transformation : Associator parent)
-  -- (pentagon   : pentagon_3step associator_transformation = pentagon_2step associator_transformation)
-  (pentagon : Pentagon associator_transformation)
+  (parent : Category)
+  (tensor : TensorProduct parent)
+  (associator_transformation : Associator tensor)
+  (pentagon                  : Pentagon associator_transformation)
 
-instance LaxMonoidalCategory_coercion : has_coe LaxMonoidalCategory.{u v} PreMonoidalCategory.{u v} :=
+instance LaxMonoidalCategory_coercion : has_coe LaxMonoidalCategory.{u v} Category.{u v} :=
   ⟨LaxMonoidalCategory.parent⟩
 
+
 -- Copying fields. TODO: automate
-@[reducible] definition LaxMonoidalCategory.Obj      ( C : LaxMonoidalCategory ) := @PreMonoidalCategory.Obj      C^.parent
-@[reducible] definition LaxMonoidalCategory.Hom      ( C : LaxMonoidalCategory ) := @PreMonoidalCategory.Hom      C^.parent
-@[reducible] definition LaxMonoidalCategory.identity ( C : LaxMonoidalCategory ) := @PreMonoidalCategory.identity C^.parent
-@[reducible] definition LaxMonoidalCategory.compose  ( C : LaxMonoidalCategory ) := @PreMonoidalCategory.compose  C^.parent
-@[reducible] definition LaxMonoidalCategory.left_identity  ( C : LaxMonoidalCategory ) := @PreMonoidalCategory.left_identity  C^.parent
-@[reducible] definition LaxMonoidalCategory.right_identity ( C : LaxMonoidalCategory ) := @PreMonoidalCategory.right_identity C^.parent
-@[reducible] definition LaxMonoidalCategory.associativity  ( C : LaxMonoidalCategory ) := @PreMonoidalCategory.associativity  C^.parent
-@[reducible] definition LaxMonoidalCategory.tensor   ( C : LaxMonoidalCategory ) := @PreMonoidalCategory.tensor   C^.parent
+@[reducible] definition LaxMonoidalCategory.Obj      ( C : LaxMonoidalCategory ) := @Category.Obj      C^.parent
+@[reducible] definition LaxMonoidalCategory.Hom      ( C : LaxMonoidalCategory ) := @Category.Hom      C^.parent
+@[reducible] definition LaxMonoidalCategory.identity ( C : LaxMonoidalCategory ) := @Category.identity C^.parent
+@[reducible] definition LaxMonoidalCategory.compose  ( C : LaxMonoidalCategory ) := @Category.compose  C^.parent
+@[reducible] definition LaxMonoidalCategory.left_identity  ( C : LaxMonoidalCategory ) := @Category.left_identity  C^.parent
+@[reducible] definition LaxMonoidalCategory.right_identity ( C : LaxMonoidalCategory ) := @Category.right_identity C^.parent
+@[reducible] definition LaxMonoidalCategory.associativity  ( C : LaxMonoidalCategory ) := @Category.associativity  C^.parent
 
 -- TODO bring back OplaxMonoidalCategory
 

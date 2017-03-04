@@ -32,21 +32,15 @@ definition TensorProductOfTypes : TensorProduct CategoryOfTypes :=
   functoriality := ♮
 }
 
-definition PreMonoidalCategoryOfTypes : PreMonoidalCategory :=
-{
-  category := CategoryOfTypes,
-  tensor := TensorProductOfTypes,
-  tensor_unit := punit
-}
-
-definition TypeAssociator : Associator PreMonoidalCategoryOfTypes := {
+definition TypeAssociator : Associator TensorProductOfTypes := {
   components := λ p, λ t, (t.1.1,(t.1.2, t.2)),
   naturality := ♮
 }
 
 definition LaxMonoidalCategoryOfTypes : LaxMonoidalCategory :=
 {
-    parent := PreMonoidalCategoryOfTypes,
+    parent := CategoryOfTypes,
+    tensor := TensorProductOfTypes,
     associator_transformation := TypeAssociator,
     pentagon := ♮
 }

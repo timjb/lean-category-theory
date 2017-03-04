@@ -16,46 +16,22 @@ universe variables u v
 
 @[reducible] definition TensorProduct ( C: Category ) := Functor ( C × C ) C
 
-structure PreMonoidalCategory :=
-  (category : Category)
-  (tensor : TensorProduct category)
-  (tensor_unit : category^.Obj)
+@[reducible] definition left_associated_triple_tensor ( C : Category.{ u v } ) ( tensor : TensorProduct C ) : Functor ((C × C) × C) C :=
+  FunctorComposition (tensor × IdentityFunctor C) tensor
+@[reducible] definition right_associated_triple_tensor ( C : Category.{ u v } ) ( tensor : TensorProduct C ) : Functor (C × (C × C)) C :=
+  FunctorComposition (IdentityFunctor C × tensor) tensor
 
-namespace PreMonoidalCategory
-  notation X `⊗` Y := (PreMonoidalCategory.tensor _)^.onObjects (X, Y)
-  notation f `⊗` g := (PreMonoidalCategory.tensor _)^.onMorphisms (f, g)
-end PreMonoidalCategory
-
-instance PreMonoidalCategory_coercion : has_coe PreMonoidalCategory Category := 
-  ⟨PreMonoidalCategory.category⟩
-
--- Copying fields. TODO: automate
-@[reducible] definition PreMonoidalCategory.Obj      ( C : PreMonoidalCategory ) := @Category.Obj      C^.category
-@[reducible] definition PreMonoidalCategory.Hom      ( C : PreMonoidalCategory ) := @Category.Hom      C^.category
-@[reducible] definition PreMonoidalCategory.identity ( C : PreMonoidalCategory ) := @Category.identity C^.category
-@[reducible] definition PreMonoidalCategory.compose  ( C : PreMonoidalCategory ) := @Category.compose  C^.category
-@[reducible] definition PreMonoidalCategory.left_identity  ( C : PreMonoidalCategory ) := @Category.left_identity  C^.category
-@[reducible] definition PreMonoidalCategory.right_identity ( C : PreMonoidalCategory ) := @Category.right_identity C^.category
-@[reducible] definition PreMonoidalCategory.associativity  ( C : PreMonoidalCategory ) := @Category.associativity  C^.category
-
--- Convenience methods which take two arguments, rather than a pair. (This seems to often help the elaborator avoid getting stuck on `prod.mk`.)
-@[reducible] definition PreMonoidalCategory.tensorObjects   ( C : PreMonoidalCategory ) ( X Y : C^.Obj ) : C^.Obj := C^.tensor (X, Y)
-@[reducible] definition PreMonoidalCategory.tensorMorphisms ( C : PreMonoidalCategory ) { W X Y Z : C^.Obj } ( f : C^.Hom W X ) ( g : C^.Hom Y Z ) : C^.Hom (C^.tensor (W, Y)) (C^.tensor (X, Z)) := C^.tensor^.onMorphisms (f, g)
-
-definition left_associated_triple_tensor ( C : PreMonoidalCategory.{ u v } ) : Functor ((C × C) × C) C :=
-  FunctorComposition (C^.tensor × IdentityFunctor C) C^.tensor
-definition right_associated_triple_tensor ( C : PreMonoidalCategory.{ u v } ) : Functor (C × (C × C)) C :=
-  FunctorComposition (IdentityFunctor C × C^.tensor) C^.tensor
-
-@[reducible] definition Associator ( C : PreMonoidalCategory.{ u v } ) := 
+@[reducible] definition Associator { C : Category.{ u v } } ( tensor : TensorProduct C ) := 
   NaturalTransformation 
-    (left_associated_triple_tensor C) 
-    (FunctorComposition (ProductCategoryAssociator C C C) (right_associated_triple_tensor C))
+    (left_associated_triple_tensor C tensor) 
+    (FunctorComposition (ProductCategoryAssociator C C C) (right_associated_triple_tensor C tensor))
 
-definition Pentagon { C: PreMonoidalCategory } ( associator : Associator C ) :=
+@[reducible] definition Pentagon { C : Category } { tensor : TensorProduct C } ( associator : Associator tensor ) :=
   let α ( X Y Z : C^.Obj ) := associator ((X, Y), Z) in
+  let tensorObjects ( X Y : C^.Obj ) := tensor^.onObjects (X, Y) in
+  let tensorMorphisms { W X Y Z : C^.Obj } ( f : C^.Hom W X ) ( g : C^.Hom Y Z ) : C^.Hom (tensorObjects W Y) (tensorObjects X Z) := tensor^.onMorphisms (f, g) in
   ∀ W X Y Z : C^.Obj, 
-    C^.compose (α (W ⊗ X) Y Z) (α W X (Y ⊗ Z))
-  = C^.compose (C^.compose (C^.tensorMorphisms (α W X Y) (C^.identity Z)) (α W (X ⊗ Y) Z)) (C^.tensorMorphisms (C^.identity W) (α X Y Z)) 
+    C^.compose (α (tensorObjects W X) Y Z) (α W X (tensorObjects Y Z))
+  = C^.compose (C^.compose (tensorMorphisms (α W X Y) (C^.identity Z)) (α W (tensorObjects X Y) Z)) (tensorMorphisms (C^.identity W) (α X Y Z)) 
 
 end tqft.categories.monoidal_category
