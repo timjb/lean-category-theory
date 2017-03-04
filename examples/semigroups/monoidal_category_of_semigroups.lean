@@ -48,13 +48,7 @@ definition TensorProductOfSemigroups : TensorProduct CategoryOfSemigroups :=
   functoriality := ♮
 }
 
-definition PreMonoidalCategoryOfSemigroups : PreMonoidalCategory := {
-  category    := CategoryOfSemigroups,
-  tensor      := TensorProductOfSemigroups,
-  tensor_unit := ⟨ punit, trivial_semigroup ⟩
-}
-
-definition SemigroupAssociator : Associator PreMonoidalCategoryOfSemigroups :=
+definition SemigroupAssociator : Associator TensorProductOfSemigroups :=
 {
   components := λ _, {
     map := λ t, (t.1.1, (t.1.2, t.2)),
@@ -65,7 +59,8 @@ definition SemigroupAssociator : Associator PreMonoidalCategoryOfSemigroups :=
 
 definition LaxMonoidalCategoryOfSemigroups : LaxMonoidalCategory :=
 {
-  parent                    := PreMonoidalCategoryOfSemigroups,
+  parent                    := CategoryOfSemigroups,
+  tensor      := TensorProductOfSemigroups,
   associator_transformation := SemigroupAssociator,
   pentagon                  := ♮
 }

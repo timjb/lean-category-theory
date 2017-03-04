@@ -14,7 +14,7 @@ open tqft.categories.natural_transformation
 namespace tqft.categories.monoidal_category
 
 lemma pentagon_in_terms_of_natural_transformations
-  ( C : MonoidalCategory ) : pentagon_2step C^.associator_transformation = pentagon_3step C^.associator_transformation :=
+  ( C : MonoidalCategory ) : pentagon_2step C = pentagon_3step C :=
   begin
     -- unfold pentagon_2step,
     -- unfold pentagon_3step,
