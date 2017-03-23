@@ -1,7 +1,7 @@
 -- Copyright (c) 2017 Scott Morrison. All rights reserved.
 -- Released under Apache 2.0 license as described in the file LICENSE.
 -- Authors: Stephen Morgan, Scott Morrison
-import ...monoidal_categories.braided_monoidal_category
+import ...monoidal_categories.monoidal_category
 
 namespace tqft.categories.examples.semigroups
 
@@ -53,11 +53,6 @@ end
     left_identity  := ♮,
     right_identity := ♮,
     associativity  := ♮
-}
-
-definition trivial_semigroup: semigroup punit := {
-  mul := λ _ _, punit.star,
-  mul_assoc := ♮
 }
 
 end tqft.categories.examples.semigroups

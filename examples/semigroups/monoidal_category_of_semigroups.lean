@@ -2,7 +2,6 @@
 -- Released under Apache 2.0 license as described in the file LICENSE.
 -- Authors: Stephen Morgan, Scott Morrison
 
-import ...monoidal_categories.braided_monoidal_category
 import .semigroups
 
 open tqft.categories.natural_transformation
@@ -56,24 +55,9 @@ definition MonoidalCategoryOfSemigroups : MonoidalCategory := {
     identities    := ♮,
     functoriality := ♮
   },
-  tensor_unit          := ⟨ punit, trivial_semigroup ⟩, -- punit is just a universe-parameterized version of unit
   associator_transformation := {
     components := λ _, {
       map := λ t, (t.1.1, (t.1.2, t.2)),
-      multiplicative := ♮
-    },
-    naturality := ♮ 
-  },
-  left_unitor := {
-    components := λ _, {
-      map := λ t, t.2,
-      multiplicative := ♮
-    },
-    naturality := ♮ 
-  },
-  right_unitor := {
-    components := λ _, {
-      map := λ t, t.1,
       multiplicative := ♮
     },
     naturality := ♮ 
@@ -92,38 +76,7 @@ definition MonoidalCategoryOfSemigroups : MonoidalCategory := {
                    exact sorry
                  end,
     witness_2 := sorry
-  },
-  left_unitor_is_isomorphism := sorry,
-  right_unitor_is_isomorphism := sorry,
-  pentagon := sorry,
-  triangle := sorry
+  }
 }
-
-open tqft.categories.natural_transformation
-open tqft.categories.braided_monoidal_category
-
--- definition BraidedMonoidalCategoryOfSemigroups : BraidedMonoidalCategory := {
---   MonoidalCategoryOfSemigroups.{u} with
---   braiding             := {
---     morphism  := {
---       components := λ _, {
---                            map := λ p, (p.2, p.1),
---                            multiplicative := ♮
---                          },
---       naturality := ♮
---     },
---     inverse   := {
---       components := λ _, {
---                            map := λ p, (p.2, p.1), -- this is sufficiently obvious that automation should be doing it for us!
---                            multiplicative := ♮
---                          },
---       naturality := ♮
---     },
---     witness_1 := ♮,
---     witness_2 := ♮
---   }
---   hexagon_1 := ♮,
---   hexagon_2 := ♮,
--- }
 
 end tqft.categories.examples.semigroups
