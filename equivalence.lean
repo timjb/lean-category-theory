@@ -59,59 +59,89 @@ lemma {u1 v1 u2 v2 u3 v3} FunctorComposition_is_composition
   { f : C.Hom X Y } :
   (FunctorComposition F G).onMorphisms f = G.onMorphisms (F.onMorphisms f) := ♯
 
+section Equivalences_are_FullyFaithful
+  universes u1 v1 u2 v2
+  parameters { C : Category.{u1 v1} } { D : Category.{u2 v2} }
+  parameter ( e : Equivalence C D )
 
+  definition F : Functor C D := e.functor
+  definition G : Functor D C := e.inverse
+  definition η : NaturalIsomorphism (FunctorComposition F G) (IdentityFunctor C) := e.isomorphism_1
+  definition ε : NaturalIsomorphism (FunctorComposition G F) (IdentityFunctor D) := e.isomorphism_2
 
-lemma {u1 v1 u2 v2} Equivalences_are_Faithful { C : Category.{u1 v1} } { D : Category.{u2 v2} } ( e : Equivalence C D ) : Faithful (e.functor) := {
-  injectivity := begin
-                  admit
-                  --  intros,
-                  --  pose wf := e.isomorphism_1.naturality_1 f,
-                  --  pose wg := e.isomorphism_1.naturality_1 g,
-                  --  rewrite IdentityFunctor_is_identity f at wf,
-                  --  rewrite IdentityFunctor_is_identity g at wg,
-                  --  rewrite - wf,
-                  --  rewrite - wg,
-                  --  unfold_unfoldable,
-                  --  rewrite p
-                 end
-}
+  local infixl `⟩C⟩`:60 := C.compose
+  local infixl `⟩D⟩`:60 := D.compose
 
-private definition {u1 v1 u2 v2} preimage { C : Category.{u1 v1} } { D : Category.{u2 v2} } ( e : Equivalence C D ) ( X Y : C.Obj ) ( h : D.Hom (e.functor X) (e.functor Y) ) := C.compose (C.compose (e.isomorphism_1.inverse.components X) (e.inverse.onMorphisms h)) (e.isomorphism_1.morphism.components Y)
+  definition image { X Y : C.Obj } ( h : C.Hom X Y ) : D.Hom (F X) (F Y) :=
+    F.onMorphisms h
 
-private lemma {u1 v1 u2 v2} preimage_lemma { C : Category.{u1 v1} } { D : Category.{u2 v2} } ( e : Equivalence C D ) ( X Y : C.Obj ) ( h : D.Hom (e.functor X) (e.functor Y) ) : (e.inverse).onMorphisms ((e.functor).onMorphisms (preimage e X Y h)) = (e.inverse).onMorphisms h :=
-begin
-  pose p := e.isomorphism_1.naturality_2 (preimage e X Y h),
-  rewrite FunctorComposition_is_composition at p,
-  rewrite (eq.symm p),
-  unfold_unfoldable,
-  repeat { rewrite - C.associativity },
-  erewrite e.isomorphism_1.componentwise_witness_1,
-  repeat { rewrite C.associativity },
-  erewrite e.isomorphism_1.componentwise_witness_1,
-  erewrite C.right_identity,
-  erewrite C.left_identity
-end
+  private definition preimage1 ( X Y : C.Obj ) ( h : D.Hom (F X) (F Y) ) : C.Hom X Y :=
+    (η.inverse.components X ⟩C⟩ G.onMorphisms h) ⟩C⟩ η.morphism.components Y
 
--- FIXME this is lame.
-meta def rewrite_once : tactic unit :=
-do r ← tactic.to_expr `(preimage_lemma e X Y h),
-   tactic.rewrite_core semireducible tt tt (occurrences.pos [2]) tt r
+  lemma preimage1_is_retraction ( X Y : C.Obj ) ( h : C.Hom X Y ) : preimage1 X Y (image h) = h :=
+    η.naturality_1 h
 
+  private definition preimage2 ( S T : D.Obj ) ( g : D.Hom (F (G S)) (F (G T)) ) : C.Hom (G S) (G T) :=
+    let g' : D.Hom S T := ε.inverse.components S ⟩D⟩ g ⟩D⟩ ε.morphism.components T
+    in G.onMorphisms g'
 
-lemma {u1 v1 u2 v2} Equivalences_are_Full { C : Category.{u1 v1} } { D : Category.{u2 v2} } ( e : Equivalence C D ) : Full (e.functor) :=
-  {
-    preimage := preimage e,
-    witness := 
-        begin 
-          intros X Y h,
-          apply (Equivalences_are_Faithful e.reverse).injectivity,
-          unfold_unfoldable,
-          -- erewrite - (preimage_lemma e X Y h),
-          rewrite_once,
-          unfold_unfoldable,
-          trivial
-        end
-  }
+  lemma preimage2_is_section ( S T : D.Obj ) ( g : D.Hom (F (G S)) (F (G T)) ) : image (preimage2 S T g) = g :=
+    let g' := ε.inverse.components S ⟩D⟩ g ⟩D⟩ ε.morphism.components T in
+    calc
+      (FunctorComposition G F).onMorphisms g'
+          =
+      ε.morphism.components S ⟩D⟩ g' ⟩D⟩ ε.inverse.components T
+          : eq.symm (NaturalIsomorphism.naturality_1 (Isomorphism.reverse ε) g')
+      ... =
+      ε.morphism.components S ⟩D⟩ (ε.inverse.components S ⟩D⟩ g ⟩D⟩ ε.morphism.components T) ⟩D⟩ ε.inverse.components T
+          : by reflexivity
+      ... =
+      (ε.morphism.components S ⟩D⟩ ε.inverse.components S) ⟩D⟩ g ⟩D⟩ (ε.morphism.components T ⟩D⟩ ε.inverse.components T)
+          : ♮
+      ... =
+      D.identity _ ⟩D⟩ g ⟩D⟩ D.identity _
+          : D.congr_compose
+              (D.congr_compose_left g (ε.componentwise_witness_1 S))
+              (ε.componentwise_witness_1 T)
+      ... =
+      g
+          : ♮
+
+  private definition preimage3 ( X Y : C.Obj ) ( h : D.Hom (F X) (F Y) ) : C.Hom X Y :=
+    let h' := F.onMorphisms (η.morphism.components X) ⟩D⟩ h ⟩D⟩ F.onMorphisms (η.inverse.components Y)
+    in η.inverse.components X ⟩C⟩ preimage2 (F X) (F Y) h' ⟩C⟩ η.morphism.components Y
+
+  lemma preimage3_is_section ( X Y : C.Obj ) ( h : D.Hom (F X) (F Y) ) : image (preimage3 X Y h) = h :=
+    let h' := F.onMorphisms (η.morphism.components X) ⟩D⟩ h ⟩D⟩ F.onMorphisms (η.inverse.components Y) in
+    calc
+      image (preimage3 X Y h)
+          =
+      F.onMorphisms (η.inverse.components X ⟩C⟩ preimage2 (F X) (F Y) h' ⟩C⟩ η.morphism.components Y)
+          : by reflexivity
+      ... =
+      F.onMorphisms (η.inverse.components X) ⟩D⟩ F.onMorphisms (preimage2 (F X) (F Y) h') ⟩D⟩ F.onMorphisms (η.morphism.components Y)
+          : ♮
+      ... =
+      F.onMorphisms (η.inverse.components X) ⟩D⟩ h' ⟩D⟩ F.onMorphisms (η.morphism.components Y)
+          : D.congr_compose_left _ (D.congr_compose_right _ (preimage2_is_section _ _ h'))
+      ... =
+      F.onMorphisms (η.inverse.components X) ⟩D⟩ (F.onMorphisms (η.morphism.components X) ⟩D⟩ h ⟩D⟩ F.onMorphisms (η.inverse.components Y)) ⟩D⟩ F.onMorphisms (η.morphism.components Y)
+          : by reflexivity
+      ... =
+      (F.onMorphisms (η.inverse.components X) ⟩D⟩ F.onMorphisms (η.morphism.components X)) ⟩D⟩ h ⟩D⟩ (F.onMorphisms (η.inverse.components Y) ⟩D⟩ F.onMorphisms (η.morphism.components Y))
+          : ♮
+      ... =
+      F.onMorphisms (η.inverse.components X ⟩C⟩ η.morphism.components X) ⟩D⟩ h ⟩D⟩ F.onMorphisms (η.inverse.components Y ⟩C⟩ η.morphism.components Y)
+          : ♮
+      ... =
+      F.onMorphisms (C.identity X) ⟩D⟩ h ⟩D⟩ F.onMorphisms (C.identity Y)
+          : D.congr_compose
+              (D.congr_compose_left h (congr_arg F.onMorphisms (η.componentwise_witness_2 X)))
+              (congr_arg F.onMorphisms (η.componentwise_witness_2 Y))
+      ... =
+      h
+          : ♮
+end Equivalences_are_FullyFaithful
 
 -- PROJECT finish this
 -- lemma Equivalences_are_Faithful { C D : Category } ( e : Equivalence C D ) : Faithful (e.functor) := sorry
