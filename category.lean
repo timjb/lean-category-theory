@@ -38,6 +38,34 @@ attribute [pointwise] Category.identity
 
 open Category
 
+lemma {u v} Category.congr_compose_right
+  ( C : Category.{u v} )
+  { X Y Z : C.Obj }
+  { g h : C.Hom Y Z }
+  ( f : C.Hom X Y )
+  ( eq : g = h ) :
+  C.compose f g = C.compose f h :=
+  congr_arg (λ k, C.compose f k) eq
+
+lemma {u v} Category.congr_compose_left
+  ( C : Category.{u v} )
+  { X Y Z : C.Obj }
+  { f g : C.Hom X Y }
+  ( h : C.Hom Y Z )
+  ( eq : f = g ) :
+  C.compose f h = C.compose g h :=
+  congr_arg (λ k, C.compose k h) eq
+
+lemma {u v} Category.congr_compose
+  ( C : Category.{u v} )
+  { X Y Z : C.Obj }
+  { f1 f2 : C.Hom X Y }
+  { g1 g2 : C.Hom Y Z }
+  ( eqf : f1 = f2 )
+  ( eqg : g1 = g2 ) :
+  C.compose f1 g1 = C.compose f2 g2 :=
+  eq.trans (C.congr_compose_left g1 eqf) (C.congr_compose_right f2 eqg)
+
 -- TODO, eventually unify this code with the corresponding code for Graph, perhaps just by making Categories Graphs.
 inductive {u v} morphism_path { C : Category.{u v} } : Obj C → Obj C → Type (max u v)
 | nil  : Π ( h : C.Obj ), morphism_path h h
